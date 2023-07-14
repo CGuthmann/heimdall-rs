@@ -1,0 +1,25 @@
+[package]
+name = "heimdall"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde_json = "1.0.9"
+serde = { version = "1.0", features = ["derive"] }
+serde-big-array = "0.5.1"
+num-bigint = { version = "0.4",default-features = false ,features = ["serde"]}
+num-traits = {version = "0.2.11"}
+crypto = {path = "../crypto"}
+ark-circom-service = { path = "../ark-circom-service"}
+witness-utils = {path = "../witness-utils"}
+
+
+[dev-dependencies]
+criterion = "0.3.5"
+
+
+[[bench]]
+name = "heimdall-presentations"
+harness = false

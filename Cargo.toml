@@ -1,0 +1,8 @@
+[workspace]
+
+members = [
+ "ark-circom-service",
+ "witness-utils",
+ "heimdall",
+ "crypto"
+]

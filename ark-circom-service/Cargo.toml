@@ -1,0 +1,28 @@
+[package]
+name = "ark-circom-service"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ark-circom = { git = "https://github.com/gakonst/ark-circom.git", rev = "35ce5a9", features = ["circom-2"] }
+color-eyre = "0.5"
+ark-std = { version = "0.3.0", default-features = false, features = ["parallel"] }
+ark-bn254 = { version = "0.3.0" }
+ark-groth16 = { git = "https://github.com/arkworks-rs/groth16", rev = "765817f", features = ["parallel"] }
+ark-ff = {version = "0.3.0"}
+ark-ec = {version = "0.3.0"}
+ark-serialize = {version = "0.3.0", features = ["derive"]}
+num-bigint = { version = "0.4", default-features = false, features = ["serde"]}
+witness-utils = {path = "../witness-utils"}
+bit-vec = {}
+serde = { version = "1.0", features = ["derive"] }
+
+[dev-dependencies]
+criterion = "0.3.5"
+
+
+[[bench]]
+name = "ark-circom-poseidon"
+harness = false
