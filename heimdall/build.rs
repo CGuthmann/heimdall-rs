@@ -20,7 +20,7 @@ fn main() {
         println!("cargo:rustc-link-lib=static=presentation_delegation");
     } else {
         println!("cargo:rustc-link-search=native=/usr/lib/gcc/x86_64-linux-gnu/10/"); //path to libstdc++.a
-        println!("cargo:rustc-link-search=native=./lib/");
+        println!("cargo:rustc-link-search=native=./heimdall/lib/x86_64-unknown-linux-gnu");
 
         println!("cargo:rustc-link-lib=static=stdc++");
         println!("cargo:rustc-link-lib=static=fr");
