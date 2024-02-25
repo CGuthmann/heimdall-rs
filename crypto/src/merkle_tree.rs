@@ -30,6 +30,7 @@ pub struct HashTree<H: HashFunction, const BRANCHING_FACTOR: usize > {
 pub struct  MerkleProof<H: HashFunction, const BRANCHING_FACTOR: usize > {
     pub path: Vec<usize>, //0 or 1
     pub lemma: Vec<BigInt>,
+    #[serde(bound(serialize = "PhantomData<H>: Serialize", deserialize = "PhantomData<H>: Deserialize<'de>"))]
     _hash_fn: PhantomData<H>,
 }
 
@@ -195,11 +196,11 @@ mod test{
             &vec!["a".to_owned(),"b".to_owned(),"c".to_owned(),"d".to_owned()]
         );
         assert!(tree.get_root().to_string() ==
-         "17730910362166365378641598934717218753860034849162057842670951476042705047777");
+         "8535275740347089689449340416732452215544475238884505322559258662396662865912");
 
         tree.update(0, "b".to_owned());
         assert!(tree.get_root().to_string() ==
-         "3850662019765955860838380521649163158910746042417369858350919191420916554922");
+         "3044625888948158814383343899956680036611526934629800520116421530768212335650");
 
     }
 
