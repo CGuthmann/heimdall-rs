@@ -14,7 +14,7 @@ use crate::HashFunction;
 /// A struct representing a hash tree.
 /// 
 /// Serializable with serde.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HashTree<H: HashFunction, const BRANCHING_FACTOR: usize > {
     depth: u32,
     pub leaves: Vec<String>,
