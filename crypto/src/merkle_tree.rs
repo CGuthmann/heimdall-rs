@@ -104,6 +104,13 @@ impl<H: HashFunction, const BRANCHING_FACTOR: usize> HashTree<H, BRANCHING_FACTO
 
 }
 
+//Implements the Clone trait
+impl<H: HashFunction, const BRANCHING_FACTOR: usize> Clone for HashTree<H,BRANCHING_FACTOR>  {
+    fn clone(&self) -> Self {
+        Self { depth: self.depth.clone(), leaves: self.leaves.clone(), data: self.data.clone(), _hasher: PhantomData::<H> }
+    }
+}
+
 ///Implements the Merkle tree functionality.
 impl<H: HashFunction> HashTree<H,2>  {
     
@@ -140,12 +147,6 @@ impl<H: HashFunction> HashTree<H,2>  {
     }
 }
 
-//Implements the Clone trait
-impl<H: HashFunction>Clone for HashTree<H,2>  {
-    fn clone(&self) -> Self {
-        Self { depth: self.depth.clone(), leaves: self.leaves.clone(), data: self.data.clone(), _hasher: PhantomData::<H> }
-    }
-}
 ///Implements the Merkle proof functionality.
 impl<H: HashFunction>  MerkleProof<H,2>{
     
