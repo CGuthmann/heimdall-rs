@@ -14,7 +14,7 @@ use crate::HashFunction;
 /// A struct representing a hash tree.
 /// 
 /// Serializable with serde.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct HashTree<H: HashFunction, const BRANCHING_FACTOR: usize > {
     depth: u32,
     pub leaves: Vec<String>,
@@ -140,6 +140,12 @@ impl<H: HashFunction> HashTree<H,2>  {
     }
 }
 
+//Implements the Clone trait
+impl<H: HashFunction>Clone for HashTree<H,2>  {
+    fn clone(&self) -> Self {
+        Self { depth: self.depth.clone(), leaves: self.leaves.clone(), data: self.data.clone(), _hasher: PhantomData::<H> }
+    }
+}
 ///Implements the Merkle proof functionality.
 impl<H: HashFunction>  MerkleProof<H,2>{
     
