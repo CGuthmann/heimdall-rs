@@ -96,10 +96,26 @@ impl<H: HashFunction, const BRANCHING_FACTOR: usize> HashTree<H, BRANCHING_FACTO
 
     ///Updates the leave at 'index' and regenerates the hash tree.
     pub fn update(&mut self, index: usize, new_leave: String) {
-        self.leaves[index] = new_leave;
-        self.generate_tree();
-    }
+        let hasher = H::new();
 
+        self.leaves[index] = new_leave.clone();
+        self.data[index] = hasher.hash(&vec![new_leave]);
+
+        let mut i = (index/BRANCHING_FACTOR)*BRANCHING_FACTOR;
+        let mut s = 0 as usize;
+        for k in 0..self.depth {
+
+            let i_n = i/BRANCHING_FACTOR;
+            let s_n = s + (BRANCHING_FACTOR as f32).pow((self.depth -k) as f32) as usize;
+
+            self.data[s_n + i_n] = hasher.hash_big_int(&self.data[s+i..s+i+BRANCHING_FACTOR]);
+            
+
+            i = (i_n/BRANCHING_FACTOR)*BRANCHING_FACTOR;
+            s = s_n;
+        }
+        
+    }
 
 
 }
@@ -108,6 +124,32 @@ impl<H: HashFunction, const BRANCHING_FACTOR: usize> HashTree<H, BRANCHING_FACTO
 impl<H: HashFunction, const BRANCHING_FACTOR: usize> Clone for HashTree<H,BRANCHING_FACTOR>  {
     fn clone(&self) -> Self {
         Self { depth: self.depth.clone(), leaves: self.leaves.clone(), data: self.data.clone(), _hasher: PhantomData::<H> }
+    }
+}
+//Implements the ToString trait
+impl<H: HashFunction, const BRANCHING_FACTOR: usize> ToString for HashTree<H,BRANCHING_FACTOR>  {
+    fn to_string(&self) -> String {
+        let mut result = String::new();
+
+        result.push_str(&format!("Leaves: {:?}\n\n", self.leaves));
+
+        result.push_str(&format!("Tree: \n"));
+
+        let mut d = 1;
+        let mut s = 1;
+        let l = self.data.len();
+        for _ in 0..=self.depth{
+            result.push_str("[");
+            for j in 0..d{
+                result.push_str(&format!("\"{}\" ",&self.data[l-s+j].to_string()));
+            }
+            result.push_str("]\n");
+
+            d = d*BRANCHING_FACTOR;
+            s = s+d;
+        }
+
+        result
     }
 }
 
@@ -144,6 +186,39 @@ impl<H: HashFunction> HashTree<H,2>  {
 
         Ok(MerkleProof::<H,2>::new(path,lemma))
         
+    }
+
+    
+
+
+    ///Updates the leaves starting at 'index' and regenerates the hash tree.
+    pub fn update_batch(&mut self, index: usize, new_leaves: &Vec<String>) {
+        let hasher = H::new();
+
+        let mut d = new_leaves.len();
+
+        for k in 0..d {
+            self.leaves[index+k] = new_leaves[k].clone();
+            self.data[index+k] = hasher.hash_str(&new_leaves[k]);
+        }
+
+        let mut i = (index/2)*2;
+        let mut s = 0 as usize;
+        for k in 0..self.depth {
+
+            let i_n = i/2;
+            let d_n = (d+1)/2;
+            let s_n = s + (2 as f32).pow((self.depth -k) as f32) as usize;
+
+            for l in 0..d_n {
+                self.data[s_n + i_n + l] = hasher.hash_big_int(&self.data[s+i+2*l..=s+i+2*l+1]);
+            }
+
+            i = (i_n/2)*2;
+            d = d_n;
+            s = s_n;
+        }
+
     }
 }
 
@@ -213,12 +288,75 @@ mod test{
 
     ///TEST: binary hash tree (Merkle tree)
     #[test]
-    fn merkle_tree(){
+    fn merkle_proof(){
         let tree = HashTree::<PoseidonHasher,2>::new(
             &vec!["a".to_owned(),"b".to_owned(),"c".to_owned(),"d".to_owned()]
         );
 
         let merkle_proof = tree.generate_proof(3).unwrap();
         assert!(merkle_proof.verify().unwrap());
+    }
+
+    ///TEST: updates
+    #[test]
+    fn merkle_updates(){
+        let mut tree = HashTree::<PoseidonHasher,2>::new(
+            &vec!["a".to_owned(),"b".to_owned(),"c".to_owned(),"d".to_owned()]
+        );
+        println!("{}", tree.to_string());
+
+        tree.update(1, "c".to_owned());
+        println!("{}", tree.to_string());
+
+        tree.update_batch(1, &vec!["c".to_owned(),"c".to_owned(),"d".to_owned()]);
+        println!("{}", tree.to_string());
+
+        tree.generate_tree();
+        println!("{}", tree.to_string());
+    }
+
+    ///TEST: updates large tree
+    #[test]
+    fn merkle_updates_large(){
+        let mut tree = HashTree::<PoseidonHasher,2>::new(
+            &(0..1024).into_iter().map(|x| x.to_string()).collect()
+        );
+        println!("{}", tree.get_root());
+
+        tree.update(351, "1234".to_owned());
+        println!("{}", tree.get_root());
+
+        tree.update_batch(351, &vec!["1234".to_owned(),"352".to_owned(),"353".to_owned()]);
+        println!("{}", tree.get_root());
+
+        tree.generate_tree();
+        println!("{}", tree.get_root());
+    }
+
+    ///TEST: updates large tree
+    #[test]
+    fn merkle_updates_branching(){
+        let mut tree = HashTree::<PoseidonHasher,3>::new(
+            &(0..9).into_iter().map(|x| x.to_string()).collect()
+        );
+        println!("{}", tree.to_string());
+
+        tree.update(7, "7".to_owned());
+        println!("{}", tree.to_string());
+
+        tree.generate_tree();
+        println!("{}\n\n", tree.to_string());
+
+        
+        let mut tree = HashTree::<PoseidonHasher,8>::new(
+            &(0..512).into_iter().map(|x| x.to_string()).collect()
+        );
+        println!("{}", tree.get_root());
+
+        tree.update(64, "64".to_owned());
+        println!("{}", tree.get_root());
+
+        tree.generate_tree();
+        println!("{}", tree.get_root());
     }
 }
