@@ -48,7 +48,7 @@ pub struct Signature<S: SignatureFunction>{
     pub r8: [BigInt;2],
     pub s: BigInt,
     pub public_key_signer: [BigInt;2],
-    _signature_function: PhantomData<S>
+    _signature_function: PhantomData<fn()->S>
 }
 
 ///Implements the Clone trait for a Signature.

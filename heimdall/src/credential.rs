@@ -16,8 +16,8 @@ pub struct Credential<H: HashFunction, S: SignatureFunction>{
     pub attributes: Vec<String>,
     pub root: BigInt,
     pub signature: Signature<S>,
-    _hash_fn: PhantomData<H>,
-    _sig_fn: PhantomData<S>
+    _hash_fn: PhantomData<fn()->H>,
+    _sig_fn: PhantomData<fn()->S>
 }
 
 
@@ -49,7 +49,7 @@ impl<H: HashFunction, S: SignatureFunction> Credential<H,S>{
         let signature = S::sign(sk_issuer, root.clone());
 
         Credential { attributes: full_attributes, root, signature,
-        _hash_fn:PhantomData::<H>, _sig_fn: PhantomData::<S> }
+        _hash_fn:PhantomData::<fn()->H>, _sig_fn: PhantomData::<fn()->S> }
     }
 }
 

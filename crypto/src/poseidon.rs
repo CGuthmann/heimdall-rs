@@ -136,7 +136,7 @@ impl SignatureFunction for PoseidonSignature {
                         BigInt::from_str_radix(&to_hex(&public_key.x),16).unwrap(),
                         BigInt::from_str_radix(&to_hex(&public_key.y),16).unwrap()
                     ],
-                _signature_function: std::marker::PhantomData::<PoseidonSignature>}
+                _signature_function: std::marker::PhantomData::<fn()->PoseidonSignature>}
     }
 
     ///Verifies the signature.

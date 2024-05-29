@@ -19,7 +19,7 @@ pub struct HashTree<H: HashFunction, const BRANCHING_FACTOR: usize > {
     depth: u32,
     pub leaves: Vec<String>,
     pub data: Vec<BigInt>,
-    _hasher: PhantomData<H>,
+    _hasher: PhantomData<fn() -> H>,
 }
 
 /// A struct representing a Merkle proof.
@@ -30,8 +30,8 @@ pub struct HashTree<H: HashFunction, const BRANCHING_FACTOR: usize > {
 pub struct  MerkleProof<H: HashFunction, const BRANCHING_FACTOR: usize > {
     pub path: Vec<usize>, //0 or 1
     pub lemma: Vec<BigInt>,
-    #[serde(bound(serialize = "PhantomData<H>: Serialize", deserialize = "PhantomData<H>: Deserialize<'de>"))]
-    _hash_fn: PhantomData<H>,
+    #[serde(bound(serialize = "PhantomData<fn()->H>: Serialize", deserialize = "PhantomData<fn()->H>: Deserialize<'de>"))]
+    _hash_fn: PhantomData<fn()->H>,
 }
 
 impl<H: HashFunction, const BRANCHING_FACTOR: usize > MerkleProof<H,BRANCHING_FACTOR> {
@@ -39,7 +39,7 @@ impl<H: HashFunction, const BRANCHING_FACTOR: usize > MerkleProof<H,BRANCHING_FA
     ///Instatiates a new MerkleProof.
     pub fn new(path: Vec<usize>, 
         lemma: Vec<BigInt>) -> Self{
-            Self { path, lemma, _hash_fn: PhantomData::<H> }
+            Self { path, lemma, _hash_fn: PhantomData::<fn()->H> }
         }
 }
 
@@ -65,7 +65,7 @@ impl<H: HashFunction, const BRANCHING_FACTOR: usize> HashTree<H, BRANCHING_FACTO
         leaves.append(&mut input.clone());
 
 
-        let mut tree = HashTree { depth,leaves, data, _hasher: PhantomData::<H> };
+        let mut tree = HashTree { depth,leaves, data, _hasher: PhantomData::<fn()->H> };
         tree.generate_tree();        
         
         tree
@@ -123,7 +123,7 @@ impl<H: HashFunction, const BRANCHING_FACTOR: usize> HashTree<H, BRANCHING_FACTO
 //Implements the Clone trait
 impl<H: HashFunction, const BRANCHING_FACTOR: usize> Clone for HashTree<H,BRANCHING_FACTOR>  {
     fn clone(&self) -> Self {
-        Self { depth: self.depth.clone(), leaves: self.leaves.clone(), data: self.data.clone(), _hasher: PhantomData::<H> }
+        Self { depth: self.depth.clone(), leaves: self.leaves.clone(), data: self.data.clone(), _hasher: PhantomData::<fn()->H> }
     }
 }
 //Implements the ToString trait
