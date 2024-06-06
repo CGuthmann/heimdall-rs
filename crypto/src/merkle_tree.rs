@@ -195,7 +195,7 @@ impl<H: HashFunction> HashTree<H,2>  {
     pub fn update_batch(&mut self, index: usize, new_leaves: &Vec<String>) {
         let hasher = H::new();
 
-        let mut d = new_leaves.len();
+        let d = new_leaves.len();
 
         for k in 0..d {
             self.leaves[index+k] = new_leaves[k].clone();
@@ -203,19 +203,24 @@ impl<H: HashFunction> HashTree<H,2>  {
         }
 
         let mut i = (index/2)*2;
+        let mut e = index + d - 1 ;
+        e = (e/2)*2+1;
         let mut s = 0 as usize;
+
+
         for k in 0..self.depth {
 
             let i_n = i/2;
-            let d_n = (d+1)/2;
+            let e_n = e/2;
             let s_n = s + (2 as f32).pow((self.depth -k) as f32) as usize;
 
-            for l in 0..d_n {
-                self.data[s_n + i_n + l] = hasher.hash_big_int(&self.data[s+i+2*l..=s+i+2*l+1]);
+            for j in i_n..=e_n {
+                let l = j-i_n;
+                self.data[s_n +j] = hasher.hash_big_int(&self.data[s+i+2*l..=s+i+2*l+1]);
             }
 
             i = (i_n/2)*2;
-            d = d_n;
+            e = (e_n/2)*2+1;
             s = s_n;
         }
 
@@ -299,7 +304,7 @@ mod test{
 
     ///TEST: updates
     #[test]
-    fn merkle_updates(){
+    fn merkle_updates_simple(){
         let mut tree = HashTree::<PoseidonHasher,2>::new(
             &vec!["a".to_owned(),"b".to_owned(),"c".to_owned(),"d".to_owned()]
         );
