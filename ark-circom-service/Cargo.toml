@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 ark-circom = { git = "https://github.com/gakonst/ark-circom.git", rev = "35ce5a9", features = ["circom-2"] }
 color-eyre = "0.5"
@@ -19,6 +18,7 @@ witness-utils = {path = "../witness-utils"}
 bit-vec = {}
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.9"
+num-traits = {}
 
 [dev-dependencies]
 criterion = "0.3.5"

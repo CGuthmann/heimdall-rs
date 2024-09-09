@@ -2,6 +2,9 @@ pub use ark_bn254::{Bn254, FrParameters};
 pub use ark_ff::BigInteger;
 use serde_json::Value;
 
+use ark_std::Zero;
+use num_traits::cast::ToPrimitive;
+
 use color_eyre::Result;
 use std::{
     error::Error,
@@ -11,14 +14,14 @@ use std::{
 
 use ark_circom::{read_zkey, CircomBuilder, CircomConfig, CircomReduction};
 use ark_ec::PairingEngine;
-use ark_ff::{BigInteger256, Fp256, FromBytes, UniformRand};
+use ark_ff::{BigInteger256, Fp256, FromBytes, PrimeField, UniformRand};
 use ark_groth16::{
     create_proof_with_reduction_and_matrices, prepare_verifying_key,
     verify_proof as verify_proof_groth16, Proof, VerifyingKey,
 };
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize, Write};
 use ark_std::rand::thread_rng;
-use num_bigint::BigInt;
+use num_bigint::{BigInt, BigUint};
 use serde::{de::value, Deserialize, Serialize};
 use witness_utils::Witness;
 
@@ -179,6 +182,7 @@ pub fn create_proof_from_circuit(
 
     println!("{}", inputs.to_string());
     dbg!("creating inputs");
+    
     match inputs.as_object() {
         Some(inputs) => {
             for (key, value) in inputs {
@@ -202,14 +206,11 @@ pub fn create_proof_from_circuit(
         }
         None => {}
     }
-
+    dbg!(&builder.inputs);
     dbg!("creating circuit");
     let circom = builder.build()?;
 
-    dbg!(circom.witness);
-
-    todo!();
-    /*
+    
     let mut buf: Cursor<Vec<u8>> = Cursor::new(Vec::new());
     buf.write_all(&zkey).unwrap();
     buf.seek(SeekFrom::Start(0)).unwrap();
@@ -220,24 +221,40 @@ pub fn create_proof_from_circuit(
     let r = ark_bn254::Fr::rand(&mut rng);
     let s = ark_bn254::Fr::rand(&mut rng);
 
+    
+    let inputs = circom.get_public_inputs().expect("No inputs");// &assignment[1..num_inputs];
 
+    let assignment = circom.witness.expect("Witness error!");
 
     let num_inputs = matrices.num_instance_variables;
     let num_constraints = matrices.num_constraints;
+
 
     let proof = create_proof_with_reduction_and_matrices::<_,CircomReduction>(&params, r, s, &matrices,
          num_inputs, num_constraints, assignment.as_slice()).unwrap();
 
     let pvk = prepare_verifying_key(&params.vk);
-    let inputs = &assignment[1..num_inputs];
+    
 
-    let verified = verify_proof_groth16(&pvk, &proof, inputs).unwrap();
+    let verified = verify_proof_groth16(&pvk, &proof, inputs.as_slice()).unwrap();
     if !verified {
         Err("Proof invalid.")?
     }
-    */
-    todo!()
+
+    let mut outputs = Vec::<BigInt>::new();
+
+    for i in 1..num_inputs {
+        outputs.push(BigInt::from_bytes_be(num_bigint::Sign::Plus,assignment[i].into_repr().to_bytes_be().as_slice()));
+        
+    }
+    
+    Ok(ArkCircomFullProof {
+        proof,
+        verification_key: params.vk,
+        outputs
+    })
 }
+
 
 ///Implement the functionality for groth16 proofs over the Bn254 curve
 impl ArkCircomFullProof<Bn254> {
@@ -388,3 +405,17 @@ pub mod poseidon_witnesscalc {
     }
 }
 
+
+
+#[cfg(test)]
+mod test{
+    use crate::create_proof_from_circuit;
+
+
+    #[test]
+    pub fn test_proof_gen(){
+        let zkey = std::fs::read("./lib/test_circuit.zkey").unwrap();
+        let proof = create_proof_from_circuit("./lib/test_circuit.wasm", "./lib/test_circuit.r1cs", "{\"a\": [\"1\",\"2\"]}", &zkey).unwrap();
+        dbg!(proof.verify());
+    }
+}
