@@ -180,7 +180,6 @@ pub fn create_proof_from_circuit(
 
     let inputs: Value = serde_json::from_str(json)?;
 
-    println!("{}", inputs.to_string());
     dbg!("creating inputs");
     
     match inputs.as_object() {
@@ -286,7 +285,7 @@ impl ArkCircomFullProof<Bn254> {
 
 ///Provides functionality required for the benchmarks.
 
-#[cfg(rapid_witnesscalc)]
+#[cfg(feature = "rapid_witnesscalc")]
 pub mod poseidon_witnesscalc {
     use std::{error::Error, io::{Cursor, Seek, SeekFrom, Write}, time::Instant};
 
@@ -328,7 +327,7 @@ pub mod poseidon_witnesscalc {
 }
 
 
-#[cfg(not(rapid_witnesscalc))]
+#[cfg(not(feature = "rapid_witnesscalc"))]
 pub mod poseidon_witnesscalc {
     use std::error::Error;
 

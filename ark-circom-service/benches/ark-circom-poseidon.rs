@@ -30,7 +30,7 @@ fn poseidon_witness_wasm(c: &mut Criterion) {
 
 
 
-#[cfg(rapid_witnesscalc)]
+#[cfg(feature = "rapid_witnesscalc")]
 ///Benchmark for the witnesscalc witness generation based on the poseidon hash
 fn poseidon_witness_witnesscalc(c: &mut Criterion) {
     c.bench_function("poseidon witness witnesscalc", |b| {
@@ -51,21 +51,21 @@ fn poseidon_prove(c: &mut Criterion) {
     let circuit = std::fs::read("lib/poseidon_bench.dat").unwrap();
     //json name-value pair as defined in poseidon_bench.circom
     
-    #[cfg(not(rapid_witnesscalc))]
+    #[cfg(not(feature = "rapid_witnesscalc"))]
     let witness = poseidon_witnesscalc::generate_poseidon_witness("{\"a\":\"3\"}", &circuit).unwrap();
 
     
-    #[cfg(rapid_witnesscalc)]
+    #[cfg(feature = "rapid_witnesscalc")]
     let witness = poseidon_witnesscalc::generate_poseidon_witness("{\"a\":\"3\"}").unwrap();
 
     c.bench_function("poseidon witness witnesscalc", |b| {
         b.iter(|| {
             
             
-            #[cfg(not(rapid_witnesscalc))]
+            #[cfg(not(feature = "rapid_witnesscalc"))]
             create_proof_from_witness(&witness, &zkey).unwrap();
             
-            #[cfg(rapid_witnesscalc)]
+            #[cfg(feature = "rapid_witnesscalc")]
             create_proof_from_witness_vector(&witness, &zkey).unwrap();
 
         })

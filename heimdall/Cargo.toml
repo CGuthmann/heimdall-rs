@@ -19,6 +19,8 @@ witness-utils = {path = "../witness-utils"}
 [dev-dependencies]
 criterion = "0.3.5"
 
+[features]
+rapid_witnesscalc = ["ark-circom-service/rapid_witnesscalc"]
 
 [[bench]]
 name = "heimdall-presentations"

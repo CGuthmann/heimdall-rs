@@ -871,7 +871,13 @@ mod test {
     ///TEST: attribute presentation
     #[test]
     fn presentation_attribute() {
+
+        #[cfg(feature = "rapid_witnesscalc")]
+        println!("Testing rapid attribute");
+
+        #[cfg(not(feature = "rapid_witnesscalc"))]
         println!("Testing attribute");
+
         let issuer_sk =
             BigInt::from_str("2951225162891973271265230278305932248884420185229553697262927872")
                 .unwrap();
@@ -908,6 +914,7 @@ mod test {
             issuer_sk.clone(),
         );
 
+        dbg!(cred.attributes.len());
         let revoc_reg =
             RevocationRegistry::<PoseidonHasher, PoseidonSignature>::new(Some(issuer_sk.clone()));
 
@@ -922,6 +929,8 @@ mod test {
             vec![0, 1, 2, 3, 4, 5, 6, 7],
         )
         .unwrap();
+
+        
 
         attr_pres.generate(None, None).unwrap();
         let duration = start.elapsed().as_millis();

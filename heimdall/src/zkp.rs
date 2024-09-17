@@ -4,11 +4,202 @@ const CIRCUITS_PATH: &str = "/data/data/com.cguthmann.vidar/circuits";
 #[cfg(not(target_os = "android"))]
 const CIRCUITS_PATH: &str = "lib";
 
+#[cfg(not(feature = "rapid_witnesscalc"))]
 ///Provides witness generation for the attribute presentation circuit.
 pub mod attribute {
 
     use super::*;
-    use std::{error::Error};
+    use std::error::Error;
+
+    use ark_circom_service::{create_proof_from_circuit, ArkCircomFullProof, Bn254};
+    use witness_utils::{create::WITNESS_SIZE_GUESS, read::read_wtns};
+
+    ///Generates a witness for the attribute presentation circuit.
+    ///
+    /// # Arguments
+    /// * 'circuit' -  The circuit definition provided by circom in the .dat file.
+    ///                 If not provided, the function attempts to read it from
+    ///                  the default directory for the system.
+    ///
+    /// * 'zkey' - The proving key for the circuit.
+    ///            If not provided, the function attempts to read it from
+    ///               the default directory for the system.
+    ///
+    pub fn proof_attribute_presentation(
+        json: &str,
+        circuit: Option<&Vec<u8>>,
+        zkey: Option<&Vec<u8>>,
+    ) -> Result<ArkCircomFullProof<Bn254>, Box<dyn Error>> {
+        let zkey = match zkey {
+            Some(res) => res.clone(),
+            None => match get_ressource("presentation_attribute.zkey") {
+                Ok(res) => res,
+                Err(er) => Err(er)?,
+            },
+        };
+
+        dbg!("Create proof from circuit");
+        std::fs::write("test_input_attr.json", &json);
+        let proof = create_proof_from_circuit(
+            "lib/presentation_attribute.wasm",
+            "lib/presentation_attribute.r1cs",
+            json,
+            &zkey
+        )?;
+
+        Ok(proof)
+    }
+}
+
+#[cfg(not(feature = "rapid_witnesscalc"))]
+///Provides witness generation for the range presentation circuit.
+pub mod range {
+
+    use super::*;
+    use std::error::Error;
+
+    use ark_circom_service::{create_proof_from_circuit, ArkCircomFullProof, Bn254};
+    use witness_utils::{create::WITNESS_SIZE_GUESS, read::read_wtns};
+
+    ///Generates a witness for the range presentation circuit.
+    ///
+    /// # Arguments
+    /// * 'circuit' -  The circuit definition provided by circom in the .dat file.
+    ///                 If not provided, the function attempts to read it from
+    ///                  the default directory for the system.
+    ///
+    /// * 'zkey' - The proving key for the circuit.
+    ///            If not provided, the function attempts to read it from
+    ///               the default directory for the system.
+    ///
+    pub fn proof_range_presentation(
+        json: &str,
+        circuit: Option<&Vec<u8>>,
+        zkey: Option<&Vec<u8>>,
+    ) -> Result<ArkCircomFullProof<Bn254>, Box<dyn Error>> {
+        let zkey = match zkey {
+            Some(res) => res.clone(),
+            None => match get_ressource("presentation_range.zkey") {
+                Ok(res) => res,
+                Err(er) => Err(er)?,
+            },
+        };
+
+        dbg!("Create proof from circuit");
+        std::fs::write("test_input_attr.json", &json);
+        let proof = create_proof_from_circuit(
+            "lib/presentation_range.wasm",
+            "lib/presentation_range.r1cs",
+            json,
+            &zkey
+        )?;
+
+        Ok(proof)
+    }
+}
+
+#[cfg(not(feature = "rapid_witnesscalc"))]
+///Provides witness generation for the polygon presentation circuit.
+pub mod polygon {
+
+    use super::*;
+    use std::error::Error;
+
+    use ark_circom_service::{create_proof_from_circuit, ArkCircomFullProof, Bn254};
+    use witness_utils::{create::WITNESS_SIZE_GUESS, read::read_wtns};
+
+    ///Generates a witness for the polygon presentation circuit.
+    ///
+    /// # Arguments
+    /// * 'circuit' -  The circuit definition provided by circom in the .dat file.
+    ///                 If not provided, the function attempts to read it from
+    ///                  the default directory for the system.
+    ///
+    /// * 'zkey' - The proving key for the circuit.
+    ///            If not provided, the function attempts to read it from
+    ///               the default directory for the system.
+    ///
+    pub fn proof_polygon_presentation(
+        json: &str,
+        circuit: Option<&Vec<u8>>,
+        zkey: Option<&Vec<u8>>,
+    ) -> Result<ArkCircomFullProof<Bn254>, Box<dyn Error>> {
+        let zkey = match zkey {
+            Some(res) => res.clone(),
+            None => match get_ressource("presentation_polygon.zkey") {
+                Ok(res) => res,
+                Err(er) => Err(er)?,
+            },
+        };
+
+        dbg!("Create proof from circuit");
+        std::fs::write("test_input_attr.json", &json);
+        let proof = create_proof_from_circuit(
+            "lib/presentation_polygon.wasm",
+            "lib/presentation_polygon.r1cs",
+            json,
+            &zkey
+        )?;
+
+        Ok(proof)
+    }
+}
+
+
+#[cfg(not(feature = "rapid_witnesscalc"))]
+///Provides witness generation for the delegation presentation circuit.
+pub mod delegation {
+
+    use super::*;
+    use std::error::Error;
+
+    use ark_circom_service::{create_proof_from_circuit, ArkCircomFullProof, Bn254};
+    use witness_utils::{create::WITNESS_SIZE_GUESS, read::read_wtns};
+
+    ///Generates a witness for the delegation presentation circuit.
+    ///
+    /// # Arguments
+    /// * 'circuit' -  The circuit definition provided by circom in the .dat file.
+    ///                 If not provided, the function attempts to read it from
+    ///                  the default directory for the system.
+    ///
+    /// * 'zkey' - The proving key for the circuit.
+    ///            If not provided, the function attempts to read it from
+    ///               the default directory for the system.
+    ///
+    pub fn proof_delegation_presentation(
+        json: &str,
+        circuit: Option<&Vec<u8>>,
+        zkey: Option<&Vec<u8>>,
+    ) -> Result<ArkCircomFullProof<Bn254>, Box<dyn Error>> {
+        let zkey = match zkey {
+            Some(res) => res.clone(),
+            None => match get_ressource("presentation_delegation.zkey") {
+                Ok(res) => res,
+                Err(er) => Err(er)?,
+            },
+        };
+
+        dbg!("Create proof from circuit");
+        std::fs::write("test_input_attr.json", &json);
+        let proof = create_proof_from_circuit(
+            "lib/presentation_delegation.wasm",
+            "lib/presentation_delegation.r1cs",
+            json,
+            &zkey
+        )?;
+
+        Ok(proof)
+    }
+}
+
+
+#[cfg(feature = "rapid_witnesscalc")]
+///Provides witness generation for the attribute presentation circuit.
+pub mod attribute {
+
+    use super::*;
+    use std::error::Error;
 
     use ark_circom_service::{create_proof_from_witness, ArkCircomFullProof, Bn254};
     use witness_utils::{create::WITNESS_SIZE_GUESS, read::read_wtns};
@@ -29,18 +220,20 @@ pub mod attribute {
     }
 
     ///Generates a witness for the attribute presentation circuit.
-    /// 
+    ///
     /// # Arguments
     /// * 'circuit' -  The circuit definition provided by circom in the .dat file.
     ///                 If not provided, the function attempts to read it from
     ///                  the default directory for the system.
-    /// 
+    ///
     /// * 'zkey' - The proving key for the circuit.
     ///            If not provided, the function attempts to read it from
     ///               the default directory for the system.
-    /// 
+    ///
     pub fn proof_attribute_presentation(
-        json: &str,circuit: Option<&Vec<u8>>, zkey: Option<&Vec<u8>>
+        json: &str,
+        circuit: Option<&Vec<u8>>,
+        zkey: Option<&Vec<u8>>,
     ) -> Result<ArkCircomFullProof<Bn254>, Box<dyn Error>> {
         let circuit = match circuit {
             Some(res) => res.clone(),
@@ -48,7 +241,7 @@ pub mod attribute {
                 Ok(res) => res,
                 Err(er) => Err(er)?,
             },
-        }; 
+        };
 
         let mut wtns: Vec<u8> = Vec::with_capacity(WITNESS_SIZE_GUESS as usize);
         let mut witness_size: u64 = WITNESS_SIZE_GUESS;
@@ -101,7 +294,7 @@ pub mod attribute {
                 Ok(res) => res,
                 Err(er) => Err(er)?,
             },
-        }; 
+        };
 
         let proof = create_proof_from_witness(&witness, &zkey)?;
 
@@ -109,11 +302,12 @@ pub mod attribute {
     }
 }
 
+#[cfg(feature = "rapid_witnesscalc")]
 ///Provides witness generation for the range presentation circuit.
 pub mod range {
     use super::*;
 
-    use std::{error::Error};
+    use std::error::Error;
 
     use ark_circom_service::{create_proof_from_witness, ArkCircomFullProof, Bn254};
     use witness_utils::{create::WITNESS_SIZE_GUESS, read::read_wtns};
@@ -134,26 +328,28 @@ pub mod range {
     }
 
     ///Generates a witness for the range presentation circuit.
-    /// 
+    ///
     /// # Arguments
     /// * 'circuit' -  The circuit definition provided by circom in the .dat file.
     ///                 If not provided, the function attempts to read it from
     ///                  the default directory for the system.
-    /// 
+    ///
     /// * 'zkey' - The proving key for the circuit.
     ///            If not provided, the function attempts to read it from
     ///               the default directory for the system.
-    /// 
+    ///
     pub fn proof_range_presentation(
-        json: &str,circuit: Option<&Vec<u8>>, zkey: Option<&Vec<u8>>
+        json: &str,
+        circuit: Option<&Vec<u8>>,
+        zkey: Option<&Vec<u8>>,
     ) -> Result<ArkCircomFullProof<Bn254>, Box<dyn Error>> {
         let circuit = match circuit {
             Some(res) => res.clone(),
-            None => match get_ressource("presentation_range.dat")  {
+            None => match get_ressource("presentation_range.dat") {
                 Ok(res) => res,
                 Err(er) => Err(er)?,
             },
-        }; 
+        };
 
         let mut wtns: Vec<u8> = Vec::with_capacity(WITNESS_SIZE_GUESS as usize);
         let mut witness_size: u64 = WITNESS_SIZE_GUESS;
@@ -200,30 +396,29 @@ pub mod range {
         }
         let witness = read_wtns(&wtns);
 
-        
         let zkey = match zkey {
             Some(res) => res.clone(),
-            None => match get_ressource("presentation_range.zkey")  {
+            None => match get_ressource("presentation_range.zkey") {
                 Ok(res) => res,
                 Err(er) => Err(er)?,
             },
-        }; 
+        };
 
         let proof = create_proof_from_witness(&witness, &zkey)?;
 
         Ok(proof)
     }
-
 }
 
+#[cfg(feature = "rapid_witnesscalc")]
 ///Provides witness generation for the polygon presentation circuit.
 pub mod polygon {
     use super::*;
-    use std::{error::Error};
+    use std::error::Error;
 
     use ark_circom_service::{create_proof_from_witness, ArkCircomFullProof, Bn254};
     use witness_utils::{create::WITNESS_SIZE_GUESS, read::read_wtns};
-    
+
     //Link to external witness generation provided by witnesscalc
     #[link(name = "presentation_polygon", kind = "static")]
     extern "C" {
@@ -240,18 +435,20 @@ pub mod polygon {
     }
 
     ///Generates a witness for the polygon presentation circuit.
-    /// 
+    ///
     /// # Arguments
     /// * 'circuit' -  The circuit definition provided by circom in the .dat file.
     ///                 If not provided, the function attempts to read it from
     ///                  the default directory for the system.
-    /// 
+    ///
     /// * 'zkey' - The proving key for the circuit.
     ///            If not provided, the function attempts to read it from
     ///               the default directory for the system.
-    /// 
+    ///
     pub fn proof_polygon_presentation(
-        json: &str,circuit: Option<&Vec<u8>>, zkey: Option<&Vec<u8>>
+        json: &str,
+        circuit: Option<&Vec<u8>>,
+        zkey: Option<&Vec<u8>>,
     ) -> Result<ArkCircomFullProof<Bn254>, Box<dyn Error>> {
         let circuit = match circuit {
             Some(res) => res.clone(),
@@ -259,7 +456,7 @@ pub mod polygon {
                 Ok(res) => res,
                 Err(er) => Err(er)?,
             },
-        }; 
+        };
 
         let mut wtns: Vec<u8> = Vec::with_capacity(WITNESS_SIZE_GUESS as usize);
         let mut witness_size: u64 = WITNESS_SIZE_GUESS;
@@ -306,31 +503,30 @@ pub mod polygon {
         }
         let witness = read_wtns(&wtns);
 
-        
         let zkey = match zkey {
             Some(res) => res.clone(),
             None => match get_ressource("presentation_polygon.zkey") {
                 Ok(res) => res,
                 Err(er) => Err(er)?,
             },
-        }; 
+        };
 
         let proof = create_proof_from_witness(&witness, &zkey)?;
 
         Ok(proof)
     }
-
 }
 
+#[cfg(feature = "rapid_witnesscalc")]
 ///Provides witness generation for the delegation presentation circuit.
 pub mod delegation {
     use super::*;
 
-    use std::{error::Error};
+    use std::error::Error;
 
     use ark_circom_service::{create_proof_from_witness, ArkCircomFullProof, Bn254};
     use witness_utils::{create::WITNESS_SIZE_GUESS, read::read_wtns};
-    
+
     //Link to external witness generation provided by witnesscalc
     #[link(name = "presentation_delegation", kind = "static")]
     extern "C" {
@@ -347,18 +543,20 @@ pub mod delegation {
     }
 
     ///Generates a witness for the delegation presentation circuit.
-    /// 
+    ///
     /// # Arguments
     /// * 'circuit' -  The circuit definition provided by circom in the .dat file.
     ///                 If not provided, the function attempts to read it from
     ///                  the default directory for the system.
-    /// 
+    ///
     /// * 'zkey' - The proving key for the circuit.
     ///            If not provided, the function attempts to read it from
     ///               the default directory for the system.
-    /// 
+    ///
     pub fn proof_delegation_presentation(
-        json: &str,circuit: Option<&Vec<u8>>, zkey: Option<&Vec<u8>>
+        json: &str,
+        circuit: Option<&Vec<u8>>,
+        zkey: Option<&Vec<u8>>,
     ) -> Result<ArkCircomFullProof<Bn254>, Box<dyn Error>> {
         let circuit = match circuit {
             Some(res) => res.clone(),
@@ -366,7 +564,7 @@ pub mod delegation {
                 Ok(res) => res,
                 Err(er) => Err(er)?,
             },
-        }; 
+        };
         let mut wtns: Vec<u8> = Vec::with_capacity(WITNESS_SIZE_GUESS as usize);
         let mut witness_size: u64 = WITNESS_SIZE_GUESS;
 
@@ -412,20 +610,18 @@ pub mod delegation {
         }
         let witness = read_wtns(&wtns);
 
-        
         let zkey = match zkey {
             Some(res) => res.clone(),
             None => match get_ressource("presentation_delegation.zkey") {
                 Ok(res) => res,
                 Err(er) => Err(er)?,
             },
-        }; 
+        };
 
         let proof = create_proof_from_witness(&witness, &zkey)?;
 
         Ok(proof)
     }
-
 }
 
 ///Attempts to load the specified ressoruce at the default location for the system.
@@ -435,4 +631,3 @@ fn get_ressource(name: &str) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
         Err(err) => Err(err)?,
     }
 }
-
