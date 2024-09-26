@@ -1,5 +1,11 @@
 use std::env;
 
+#[cfg(not(feature = "rapid_witnesscalc"))]
+fn main() {
+    
+}
+
+#[cfg(feature = "rapid_witnesscalc")]
 fn main() {
     let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
 
