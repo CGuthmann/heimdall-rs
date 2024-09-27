@@ -154,6 +154,18 @@ impl SignatureFunction for PoseidonSignature {
 
         babyjubjub_rs::verify(public_key, baby_jubjub_signature, msg.clone())
     }
+    
+    fn new_key_pair()->(BigInt, [BigInt;2]) {       
+        
+        let private_key = babyjubjub_rs::new_key();
+        
+        let public_key = private_key.public();
+        
+        ( BigInt::from_bytes_be(num_bigint::Sign::Plus,&private_key.key),
+            [BigInt::from_str_radix(&to_hex(&public_key.x),16).unwrap(),
+            BigInt::from_str_radix(&to_hex(&public_key.y),16).unwrap()])
+                        
+    }
 }
 
 ///Implementing private/public key functionality
@@ -161,7 +173,7 @@ impl PoseidonSignature {
 
     pub fn generate_private_key() -> BigInt{
         let private_key = new_key();
-        private_key.scalar_key()
+        BigInt::from_bytes_be(num_bigint::Sign::Plus,&private_key.key)
     }
 
     pub fn get_public_keys(secret_key: BigInt) -> [BigInt;2]{      
@@ -209,9 +221,8 @@ mod test{
     fn test_poseidon_signature_key_conversion(){
 
         let private_key = 
-        BigInt::from_str_radix("0001020304050607080900010203040506070809000102030405060708090001",16).unwrap();
-    
-    
+        BigInt::from_str_radix("1020304050607080900010203040506070809000102030405060708090001",16).unwrap();
+        
         let mut sk_raw = private_key.to_bytes_le().1;
         assert!(sk_raw.len() <= 32);
         for _i in sk_raw.len() .. 32 {
@@ -223,7 +234,7 @@ mod test{
 
 
         let pk = PrivateKey::import(sk_raw).expect("imported key can not be bigger than 32 bytes");
-        
+        dbg!(BigInt::from_bytes_be(num_bigint::Sign::Plus,&pk.key));
         let sk = PrivateKey::import(
             hex::decode("0001020304050607080900010203040506070809000102030405060708090001")
                 .unwrap(),

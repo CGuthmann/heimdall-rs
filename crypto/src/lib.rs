@@ -39,6 +39,9 @@ pub trait SignatureFunction: Sized{
 
     ///Verifies the signature.
     fn verify(sig: &Signature<Self>, msg: &BigInt) -> bool;
+
+    //Generates a random key pair.
+    fn new_key_pair()->(BigInt, [BigInt;2]);
 }
 
 ///A struct representing a signature
